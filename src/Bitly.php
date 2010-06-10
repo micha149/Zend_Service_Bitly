@@ -2,8 +2,8 @@
 
 require_once 'Zend/Service/Abstract.php';
 
-class Zend_Service_Bitly {
-
+class Zend_Service_Bitly extends Zend_Service_Abstract
+{
     /**
      * Url to the bit.ly API
      */
@@ -47,7 +47,12 @@ class Zend_Service_Bitly {
      * @param  string $apiKey Your Flickr API key
      * @return void
      */
-    public function __construct($userId, $apiKey) {
+    public function __construct($userId = '', $apiKey = '')
+    {
+        if (!extension_loaded('iconv')) {
+            throw new Zend_Service_Bitly_Exception('Extension "iconv" is not loaded!');
+        }
+        
         iconv_set_encoding('output_encoding', 'UTF-8');
         iconv_set_encoding('input_encoding', 'UTF-8');
         iconv_set_encoding('internal_encoding', 'UTF-8');
@@ -60,7 +65,8 @@ class Zend_Service_Bitly {
      *
      * @return Zend_Http_Client
      */
-    public function getHttpClient() {
+    public function getHttpClient()
+    {
         if (null === $this->_restClient) {
             require_once 'Zend/Http/Client.php';
             $this->setHttpClient(new Zend_Http_Client(self::URI_BASE));
@@ -74,32 +80,34 @@ class Zend_Service_Bitly {
      * @param Zend_Http_Client $client Http client object
      * @return Zend_Service_Bitly Returns itself for fluent concatination
      */
-    public function setHttpClient(Zend_Http_Client $client) {
-    	$this->_httpClient = $client;
-    	return $this;
-   	}
-   	
-   	/**
-   	 * Processes the HTTP Request to the API
-   	 *
-   	 * @param string $path Pathname of API method
-   	 * @param array $params Associative array with api method parameters
-   	 * @return Zend_Http_Response HTTP Response Object
-   	 */
-   	protected function _request($path, array $params = array()) {
-   		$client = $this->getHttpClient();
-   		$client->resetParameters();
-   		
-   		$params = array_merge(array(
-   			'apiKey' => $this->apiKey,
-   			'login'  => $this->userId,
-   			'format' => $this->format == 'object' ? 'json' : $this->format
-   		), $params);
-   		
-   		$client->getUri()->setPath($path);
-   		$client->setParameterGet($params);
+    public function setHttpClient(Zend_Http_Client $client)
+    {
+        $this->_httpClient = $client;
+        return $this;
+    }
+       
+    /**
+     * Processes the HTTP Request to the API
+     *
+     * @param string $path Pathname of API method
+     * @param array $params Associative array with api method parameters
+     * @return Zend_Http_Response HTTP Response Object
+     */
+    protected function _request($path, array $params = array())
+    {
+        $client = $this->getHttpClient();
+        $client->resetParameters();
+       
+        $params = array_merge(array(
+            'apiKey' => $this->apiKey,
+            'login'  => $this->userId,
+            'format' => $this->format == 'object' ? 'json' : $this->format
+        ), $params);
+       
+        $client->getUri()->setPath($path);
+        $client->setParameterGet($params);
 
-   		return $client->request(Zend_Http_Client::GET);
+        return $client->request(Zend_Http_Client::GET);
     }
     
     /**
@@ -111,42 +119,46 @@ class Zend_Service_Bitly {
      * 
      * @param Zend_Http_Response $response Response object
      */
-    protected function _createResult(Zend_Http_Response $response) {
-    	if ($this->format == 'object') {
-    		return new Zend_Service_Bitly_Result($response);
-    	}
-    	return $response->getBody();
+    protected function _createResult(Zend_Http_Response $response)
+    {
+        if ($this->format == 'object') {
+            return new Zend_Service_Bitly_Result($response);
+        }
+        return $response->getBody();
     }
-   	
-   	/**
-   	 * Shorten an URL by using the API
-   	 *
-   	 * @param string URL to shorten
-   	 */
-   	public function shorten($longUrl) {
-   		$response = $this->_request('/v3/shorten', array(
-   			'longUrl' => $longUrl
-   		));
-   		return $this->_createResult($response);
-   	}
-   	
-   	/**
-   	 * Given a bit.ly URL or hash (or multiple), this method
-   	 * decodes it by using the API
-   	 *
-   	 * @param string|array $hash One or more hashes or short URLs
-   	 * @return 
-   	 */
-   	public function expand($hash) {
-   		$params = array();
-   		// If there is any slash in the string, it should be an url
-   		if (strpos($hash, '/') !== FALSE) {
-   			$params['shortUri'] = $hash;
-   		} else {
-   			$params['hash'] = $hash;
-   		}
+       
+    /**
+     * Shorten an URL by using the API
+     *
+     * @param string URL to shorten
+     */
+    public function shorten($longUrl)
+    {
+        $response = $this->_request('/v3/shorten', array(
+            'longUrl' => $longUrl
+        ));
+        
+        return $this->_createResult($response);
+    }
+       
+    /**
+     * Given a bit.ly URL or hash (or multiple), this method
+     * decodes it by using the API
+     *
+     * @param string|array $hash One or more hashes or short URLs
+     * @return 
+     */
+    public function expand($hash)
+    {
+        $params = array();
+        // If there is any slash in the string, it should be an url
+        if (strpos($hash, '/') !== FALSE) {
+            $params['shortUri'] = $hash;
+        } else {
+            $params['hash'] = $hash;
+        }
 
-   		$response = $this->_request('/v3/expand', $params);
-   		return new $this->_createResult($response);
-   	}
+        $response = $this->_request('/v3/expand', $params);
+        return new $this->_createResult($response);
+    }
 }
