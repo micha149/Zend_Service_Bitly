@@ -47,10 +47,11 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      *  # Saves the user ID
      *  # Saves the API key
      *
-     * @param  string $apiKey Your Flickr API key
+     * @param  string $login  Your Bitly user name
+     * @param  string $apiKey Your Bitly API key
      * @return void
      */
-    public function __construct($userId = '', $apiKey = '')
+    public function __construct($login = null, $apiKey = null)
     {
         if (!extension_loaded('iconv')) {
             throw new Zend_Service_Bitly_Exception('Extension "iconv" is not loaded!');
@@ -59,8 +60,8 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         iconv_set_encoding('output_encoding', 'UTF-8');
         iconv_set_encoding('input_encoding', 'UTF-8');
         iconv_set_encoding('internal_encoding', 'UTF-8');
-        $this->userId = (string) $userId;
-        $this->apiKey = (string) $apiKey;
+        $this->setLogin($login);
+        $this->setApiKey($apiKey);
     }
        
     /**
@@ -154,6 +155,10 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      */
     public function getApiKey()
     {
+        if ($this->_apiKey === null)
+        {
+            throw new Zend149_Service_Bitly_Exception('Api key was not set');
+        }
         return $this->_apiKey;
     }
     
@@ -176,6 +181,10 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      */
     public function getLogin()
     {
+        if ($this->_login === null)
+        {
+            throw new Zend149_Service_Bitly_Exception('Login name was not set');
+        }
         return $this->_login;
     }
     
