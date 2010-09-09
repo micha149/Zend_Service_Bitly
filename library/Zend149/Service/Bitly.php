@@ -10,6 +10,16 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     const URI_BASE = 'http://api.bit.ly/';
 
     /**
+     * Name for the shorten action
+     */
+    const ACTION_SHORTEN = 'shorten';
+
+    /**
+     * Name for the expand action
+     */
+    const ACTION_EXPAND = 'expand';
+
+    /**
      * The used bit.ly API key
      *
      * @var string
@@ -88,13 +98,17 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      * In other cases, the http response body is returned.
      * 
      * @param Zend_Http_Response $response Response object
+     * @param string $action Action name const like self::ACTION_SHORTEN or self::ACTION_EXPAND
      */
-    protected function _createResult(Zend_Http_Response $response)
+    protected function _createResult(Zend_Http_Response $response, $action)
     {
-        if ($this->getFormat() == 'object') {
-            return new Zend_Service_Bitly_Result($response);
+        $result = $response->getBody();
+        $className    = 'Zend_Service_Bitly_Result_' . ucfirst($action);
+        if ($this->getFormat() == 'object')
+        {
+            return new $className($result);
         }
-        return $response->getBody();
+        return $result;
     }
        
     /**
@@ -108,7 +122,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
             'longUrl' => $longUrl
         ));
         
-        return $this->_createResult($response);
+        return $this->_createResult($response, self::ACTION_SHORTEN);
     }
        
     /**
@@ -130,7 +144,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
 
         $response = $this->_request('/v3/expand', $params);
 
-        return $this->_createResult($response);
+        return $this->_createResult($response, self::ACTION_EXPAND);
     }
     
     /**
