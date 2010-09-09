@@ -71,7 +71,7 @@ class Zend_Service_Bitly extends Zend_Service_Abstract
         $params = array_merge(array(
             'apiKey' => $this->getApiKey(),
             'login'  => $this->getUserId(),
-            'format' => 'json'
+            'format' => $this->getFormat(),
         ), $params);
        
         $client->getUri()->setPath($path);
@@ -193,14 +193,15 @@ class Zend_Service_Bitly extends Zend_Service_Abstract
      * @param  string $format
      * @return Zend_Service_Bitly
      */
-    public function setFormat($format = 'object')
+    public function setFormat($format)
     {
         $allowed = array('object', 'json');
         
         if (in_array($format, $allowed))
         {
-            $this->_format = $format;
+            throw new Zend_Service_Bitly_Exception("Response format '" . $format . "' is not supported");
         }
+        $this->_format = $format;
         return $this;
     }
 }
