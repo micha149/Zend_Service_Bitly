@@ -1,20 +1,18 @@
 <?php 
 
-class Zend149_Service_Bitly_Result
+abstract class Zend149_Service_Bitly_Result
 {
-    protected $_data;
-    
     protected $_statusCode;
     
     protected $_statusText;
     
-    public function __construct(Zend_Http_Response $response)
+    public function __construct($result)
     {
-        $responseBody = json_decode($response->getBody());
+        $resultObject = Zend_Json::decode($result);
         
-        $this->setStatusCode($responseBody->status_code)
-             ->setStatusText($responseBody->status_txt)
-             ->setData($responseBody->data);
+        $this->setStatusCode($resultObject->status_code)
+             ->setStatusText($resultObject->status_txt)
+             ->setData($resultObject->data);
     }
     
     public function setStatusCode($code)
@@ -39,17 +37,22 @@ class Zend149_Service_Bitly_Result
         return $this->_statusText;
     }
  
-    protected function setData(stdClass $data)
+    public function setData(stdClass $data)
     {
         $methods = get_class_methods($this);
-        foreach ($data as $key => $value) {
-            $key = $this->parseKeyName($key);
-            $this->_data[$key] = $value;
+        foreach ($data as $key => $value)
+        {
+            $key    = $this->_parseKeyName($key);
+            $method = 'set' . ucfirst($key);
+            if (in_array($method, $methods))
+            {
+                $this->$method($value);
+	        }
         }
         return $this;
     }
-    
-    protected function parseKeyName($key)
+
+    protected function _parseKeyName($key)
     {
         $parts = explode('_', $key);
         for ($i = 1; $i < count($parts); $i++) {
