@@ -81,7 +81,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         $params = array_merge(array(
             'apiKey' => $this->getApiKey(),
             'login'  => $this->getUserId(),
-            'format' => $this->getFormat(),
+            'format' => $this->getFormat() == 'object' ? 'json' : $this->getFormat(),
         ), $params);
        
         $client->getUri()->setPath($path);
