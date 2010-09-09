@@ -1,6 +1,6 @@
 <?php 
 
-class Zend_Service_Bitly_Result
+class Zend149_Service_Bitly_Result
 {
     protected $_data;
     

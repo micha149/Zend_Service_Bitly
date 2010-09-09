@@ -2,7 +2,7 @@
 
 require_once 'Zend/Service/Abstract.php';
 
-class Zend_Service_Bitly extends Zend_Service_Abstract
+class Zend149_Service_Bitly extends Zend_Service_Abstract
 {
     /**
      * Url to the bit.ly API
