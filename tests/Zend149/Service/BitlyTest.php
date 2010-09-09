@@ -57,25 +57,46 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testGetApiKey().
+     * Tests the api key getter
+     *
+     * @covers Zend149_Service_Bitly::getApiKey
      */
     public function testGetApiKey()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $bitly    = $this->object;
+        $expected = 'adadkasdklasldklasdklaklsdkl';
+
+        $bitly->setApiKey($expected);
+
+        $this->assertEquals($expected, $bitly->getApiKey());
     }
 
     /**
-     * @todo Implement testSetApiKey().
+     * Tests the api key getter with a missing value. An exception is expected
+     *
+     *
+     * @covers Zend149_Service_Bitly::getapiKey
+     * @expectedException Zend149_Service_Bitly_Exception
+     */
+    public function testGetApiKeyWithoutValue()
+    {
+        $bitly = $this->object;
+        $bitly->getApiKey();
+    }
+
+    /**
+     * Tests the api key setter
+     * 
+     * @covers Zend149_Service_Bitly::setApiKey
      */
     public function testSetApiKey()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $bitly    = $this->object;
+        $expected = 'adadkasdklasldklasdklaklsdkl';
+
+        $bitly->setApiKey($expected);
+
+        $this->assertAttributeEquals($expected, '_apiKey', $bitly);
     }
 
     /**
@@ -93,6 +114,19 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $bitly->getLogin());
     }
 
+    /**
+     * Tests the login getter with a missing login value. An exception is expected
+     *
+     *
+     * @covers Zend149_Service_Bitly::getLogin
+     * @expectedException Zend149_Service_Bitly_Exception
+     */
+    public function testGetLoginWithoutValue()
+    {
+        $bitly = $this->object;
+        $bitly->getLogin();
+    }
+    
     /**
      * Tests the login setter
      *
