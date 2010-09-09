@@ -81,7 +81,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
        
         $params = array_merge(array(
             'apiKey' => $this->getApiKey(),
-            'login'  => $this->getUserId(),
+            'login'  => $this->getLogin(),
             'format' => $this->getFormat() == 'object' ? 'json' : $this->getFormat(),
         ), $params);
        
@@ -103,8 +103,8 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      */
     protected function _createResult(Zend_Http_Response $response, $action)
     {
-        $result = $response->getBody();
-        $className    = 'Zend_Service_Bitly_Result_' . ucfirst($action);
+        $result    = $response->getBody();
+        $className = 'Zend149_Service_Bitly_Result_' . ucfirst($action);
         if ($this->getFormat() == 'object')
         {
             return new $className($result);
@@ -116,6 +116,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      * Shorten an URL by using the API
      *
      * @param string URL to shorten
+     * @return Zend149_Service_Bitly_Result_Shorten
      */
     public function shorten($longUrl)
     {
@@ -131,7 +132,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      * decodes it by using the API
      *
      * @param string|array $hash One or more hashes or short URLs
-     * @return 
+     * @return Zend149_Service_Bitly_Result_Expand
      */
     public function expand($hash)
     {
