@@ -199,7 +199,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         
         if (!in_array($format, $allowed))
         {
-            throw new Zend_Service_Bitly_Exception("Response format '" . $format . "' is not supported");
+            throw new Zend149_Service_Bitly_Exception("Response format '" . $format . "' is not supported");
         }
         $this->_format = $format;
         return $this;
