@@ -31,7 +31,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-
+        unset($this->object);
     }
 
     /**
@@ -101,27 +101,58 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testGetFormat().
+     * Tests the format setter with valid formats
+     *
+     * @covers Zend149_Service_Bitly::setFormat
      */
-    public function testGetFormat()
+    public function testSetValidFormat()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $bitly = $this->object;
+
+        $bitly->setFormat('object');
+        $this->assertAttributeEquals('object', '_format', $bitly);
+
+        $bitly->setFormat('json');
+        $this->assertAttributeEquals('json', '_format', $bitly);
     }
 
     /**
-     * @todo Implement testSetFormat().
+     * Tests the format setter with an invalid format. An Exception should come up.
+     *
+     * @covers Zend149_Service_Bitly::setFormat
+     * @expectedException Zend149_Service_Bitly_Exception
      */
-    public function testSetFormat()
+    public function testSetInvalidFormat()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $bitly = $this->object;
+        $bitly->setFormat('hurz');
     }
 
-}
+    /**
+     * Test the format getter
+     *
+     * @covers Zend149_Service_Bitly::getFormat
+     */
+    public function testGetFormat()
+    {
+        $bitly = $this->object;
+        $expected = 'json';
 
-?>
+        $bitly->setFormat($expected);
+
+        $result = $bitly->getFormat();
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the format getter with default value
+     *
+     * @covers Zend149_Service_Bitly::getFormat
+     */
+    public function testGetDefaultFormat()
+    {
+        $bitly = $this->object;
+        $result = $bitly->getFormat();
+        $this->assertEquals('object', $result);
+    }
+}
