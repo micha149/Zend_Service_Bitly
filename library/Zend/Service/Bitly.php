@@ -197,7 +197,7 @@ class Zend_Service_Bitly extends Zend_Service_Abstract
     {
         $allowed = array('object', 'json');
         
-        if (in_array($format, $allowed))
+        if (!in_array($format, $allowed))
         {
             throw new Zend_Service_Bitly_Exception("Response format '" . $format . "' is not supported");
         }
