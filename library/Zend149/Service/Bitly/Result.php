@@ -9,10 +9,9 @@ abstract class Zend149_Service_Bitly_Result
     public function __construct($result)
     {
         $resultObject = Zend_Json::decode($result);
-        
-        $this->setStatusCode($resultObject->status_code)
-             ->setStatusText($resultObject->status_txt)
-             ->setData($resultObject->data);
+        $this->setStatusCode($resultObject['status_code'])
+             ->setStatusText($resultObject['status_txt'])
+             ->setData($resultObject['data']);
     }
     
     public function setStatusCode($code)
@@ -37,7 +36,7 @@ abstract class Zend149_Service_Bitly_Result
         return $this->_statusText;
     }
  
-    public function setData(stdClass $data)
+    public function setData(array $data)
     {
         $methods = get_class_methods($this);
         foreach ($data as $key => $value)
