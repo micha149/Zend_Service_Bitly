@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Server: nginx/0.7.42
+Date: Thu, 09 Sep 2010 21:00:30 GMT
+Content-Type: application/json; charset=utf-8
+Connection: keep-alive
+MIME-Version: 1.0
+Content-Length: 183
+
+{ "status_code": 200, "status_txt": "OK", "data": { "long_url": "http:\/\/example.com", "url": "http:\/\/bit.ly\/atA9Mk", "hash": "atA9Mk", "global_hash": "4jgguo", "new_hash": 0 } }

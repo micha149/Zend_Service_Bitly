@@ -12,9 +12,32 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
 {
 
     /**
+     * The Bitly service object
+     *
      * @var Zend149_Service_Bitly
      */
-    protected $object;
+    protected $_bitly;
+
+    /**
+     * Proxy for protected methods of Zend149_Service_Bitly
+     *
+     * @var Zend149_Service_BitlyProxy
+     */
+    protected $_bitlyProxy;
+
+    /**
+     * Path to test data files
+     *
+     * @var string
+     */
+    protected $_filesPath;
+
+    /**
+     * HTTP client adapter for testing
+     *
+     * @var Zend_Http_Client_Adapter_Test
+     */
+    protected $_httpClientAdapterTest;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -22,16 +45,26 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new Zend149_Service_Bitly;
+        $this->_bitly       = new Zend149_Service_Bitly;
+        $this->_bitlyProxy  = new Zend149_Service_BitlyProxy;
+        $this->_filesPath   = dirname(__FILE__) . '/Bitly/_files';
+
+        /**
+         * @see Zend_Http_Client_Adapter_Test
+         */
+        require_once 'Zend/Http/Client/Adapter/Test.php';
+        $this->_httpClientAdapterTest = new Zend_Http_Client_Adapter_Test();
     }
 
     /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
+     * Utility method for returning a string HTTP response, which is loaded from a file
+     *
+     * @param  string $name
+     * @return string
      */
-    protected function tearDown()
+    protected function _loadResponse($name, $format)
     {
-        unset($this->object);
+        return file_get_contents("$this->_filesPath/$name.$format");
     }
 
     /**
@@ -39,10 +72,22 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testShorten()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->_bitly->getHttpClient()
+                     ->setAdapter($this->_httpClientAdapterTest);
+
+        $this->_bitly->setLogin('micha149')
+                     ->setApiKey('asdasdaad');
+
+        $this->_httpClientAdapterTest->setResponse($this->_loadResponse('shorten', 'json'));
+
+        $result = $this->_bitly->shorten('http://example.com/');
+
+        $this->assertTrue($result instanceof Zend149_Service_Bitly_Result_Shorten);
+        $this->assertEquals('http://example.com', $result->getLongUrl());
+        $this->assertEquals('http://bit.ly/atA9Mk', $result->getUrl());
+        $this->assertEquals('atA9Mk', $result->getHash());
+        $this->assertEquals('4jgguo', $result->getGlobalHash());
+        $this->assertFalse($result->isNewHash());
     }
 
     /**
@@ -63,7 +108,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetApiKey()
     {
-        $bitly    = $this->object;
+        $bitly    = $this->_bitly;
         $expected = 'adadkasdklasldklasdklaklsdkl';
 
         $bitly->setApiKey($expected);
@@ -74,13 +119,12 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     /**
      * Tests the api key getter with a missing value. An exception is expected
      *
-     *
      * @covers Zend149_Service_Bitly::getapiKey
      * @expectedException Zend149_Service_Bitly_Exception
      */
     public function testGetApiKeyWithoutValue()
     {
-        $bitly = $this->object;
+        $bitly = $this->_bitly;
         $bitly->getApiKey();
     }
 
@@ -91,7 +135,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testSetApiKey()
     {
-        $bitly    = $this->object;
+        $bitly    = $this->_bitly;
         $expected = 'adadkasdklasldklasdklaklsdkl';
 
         $bitly->setApiKey($expected);
@@ -106,7 +150,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLogin()
     {
-        $bitly    = $this->object;
+        $bitly    = $this->_bitly;
         $expected = 'micha149';
 
         $bitly->setLogin($expected);
@@ -123,7 +167,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetLoginWithoutValue()
     {
-        $bitly = $this->object;
+        $bitly = $this->_bitly;
         $bitly->getLogin();
     }
     
@@ -134,7 +178,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testSetLogin()
     {
-        $bitly    = $this->object;
+        $bitly    = $this->_bitly;
         $expected = 'micha149';
 
         $bitly->setLogin($expected);
@@ -149,7 +193,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testSetValidFormat()
     {
-        $bitly = $this->object;
+        $bitly = $this->_bitly;
 
         $bitly->setFormat('object');
         $this->assertAttributeEquals('object', '_format', $bitly);
@@ -166,7 +210,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testSetInvalidFormat()
     {
-        $bitly = $this->object;
+        $bitly = $this->_bitly;
         $bitly->setFormat('hurz');
     }
 
@@ -177,7 +221,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetFormat()
     {
-        $bitly = $this->object;
+        $bitly = $this->_bitly;
         $expected = 'json';
 
         $bitly->setFormat($expected);
@@ -193,8 +237,16 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetDefaultFormat()
     {
-        $bitly = $this->object;
+        $bitly = $this->_bitly;
         $result = $bitly->getFormat();
         $this->assertEquals('object', $result);
+    }
+
+}
+
+class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
+{
+    public function  _request($path, array $params = array()) {
+        return parent::_request($path, $params);
     }
 }
