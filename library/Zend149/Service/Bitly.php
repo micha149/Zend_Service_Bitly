@@ -31,7 +31,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      *
      * @var string
      */
-    protected $_userId;
+    protected $_login;
     
     /**
      * Format of response
@@ -170,24 +170,24 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     }
     
     /**
-     * Get the User ID
+     * Get the login name
      * 
      * @return string
      */
-    public function getUserId()
+    public function getLogin()
     {
-        return $this->_userId;
+        return $this->_login;
     }
     
     /**
-     * Set the User ID
+     * Set the login name
      * 
-     * @param  string $userId
+     * @param  string $login Login Name
      * @return Zend_Service_Bitly
      */
-    public function setUserId($userId = '')
+    public function setLogin($login = '')
     {
-        $this->_userId = $userId;
+        $this->_login = $login;
         return $this;
     }
     

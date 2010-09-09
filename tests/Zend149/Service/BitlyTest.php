@@ -79,25 +79,33 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testGetUserId().
+     * Tests the login getter
+     *
+     * @covers Zend149_Service_Bitly::getLogin
      */
-    public function testGetUserId()
+    public function testGetLogin()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $bitly    = $this->object;
+        $expected = 'micha149';
+
+        $bitly->setLogin($expected);
+
+        $this->assertEquals($expected, $bitly->getLogin());
     }
 
     /**
-     * @todo Implement testSetUserId().
+     * Tests the login setter
+     *
+     * @covers Zend149_Service_Bitly::setLogin
      */
-    public function testSetUserId()
+    public function testSetLogin()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $bitly    = $this->object;
+        $expected = 'micha149';
+
+        $bitly->setLogin($expected);
+        
+        $this->assertAttributeEquals($expected, '_login', $bitly);
     }
 
     /**
