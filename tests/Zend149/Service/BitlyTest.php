@@ -192,16 +192,26 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      * Tests the format setter with valid formats
      *
      * @covers Zend149_Service_Bitly::setFormat
+     * @dataProvider validFormatsDataProvider
      */
-    public function testSetValidFormat()
+    public function testSetValidFormat($format)
     {
-        $bitly = $this->_bitly;
+        $this->_bitly->setFormat($format);
+        $this->assertAttributeEquals($format, '_format', $this->_bitly);
+    }
 
-        $bitly->setFormat('object');
-        $this->assertAttributeEquals('object', '_format', $bitly);
-
-        $bitly->setFormat('json');
-        $this->assertAttributeEquals('json', '_format', $bitly);
+    /**
+     * Data provider for valid result formats
+     *
+     * @return array Array with format strings
+     */
+    public function validFormatsDataProvider() {
+        return array(
+            array('object'),
+            array('json'),
+            array('txt'),
+            array('xml'),
+        );
     }
 
     /**

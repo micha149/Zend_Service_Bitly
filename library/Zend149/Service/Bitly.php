@@ -219,7 +219,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      */
     public function setFormat($format)
     {
-        $allowed = array('object', 'json');
+        $allowed = array('object', 'json', 'xml', 'txt');
         
         if (!in_array($format, $allowed))
         {
