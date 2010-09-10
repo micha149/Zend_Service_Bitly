@@ -68,7 +68,36 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the request method
+     *
+     * @covers Zend149_Service_Bitly::_request
+     */
+    public function testRequest()
+    {
+        $clientStub       = $this->getMock('Zend_Http_Client', array('request'));
+        $expectedResponse = 'Dummy';
+        $methodPath       = '/path/to/method';
+        $expectedParams   =  array (
+            'apiKey' => 'kaskdllaksdklasdklakd',
+            'format' => 'json',
+            'login'  => 'micha149',
+        );
+
+        $clientStub->expects($this->once())
+                   ->method('request')
+                   ->will($this->returnValue($expectedResponse));
+
+        $this->_bitlyProxy->setHttpClient($clientStub);
+        $this->_bitlyProxy->_request($methodPath);
+
+        $this->assertEquals('http://api.bit.ly:80'.$methodPath, $clientStub->getUri(TRUE));
+        $this->assertAttributeEquals($expectedParams, 'paramsGet', $clientStub);
+    }
+
+    /**
      * Tests the shorten method
+     * 
+     * @covers Zend149_Service_Bitly::shorten
      */
     public function testShorten()
     {
@@ -258,6 +287,22 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
 
 class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
 {
+    
+    public function getFormat()
+    {
+        return 'json';
+    }
+
+    public function getApiKey()
+    {
+        return 'kaskdllaksdklasdklakd';
+    }
+
+    public function getLogin()
+    {
+        return 'micha149';
+    }
+
     public function  _request($path, array $params = array()) {
         return parent::_request($path, $params);
     }
