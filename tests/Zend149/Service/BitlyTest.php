@@ -68,7 +68,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testShorten().
+     * Tests the shorten method
      */
     public function testShorten()
     {
@@ -83,6 +83,8 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
         $result = $this->_bitly->shorten('http://example.com/');
 
         $this->assertTrue($result instanceof Zend149_Service_Bitly_Result_Shorten);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertSame('OK', $result->getStatusText());
         $this->assertEquals('http://example.com', $result->getLongUrl());
         $this->assertEquals('http://bit.ly/atA9Mk', $result->getUrl());
         $this->assertEquals('atA9Mk', $result->getHash());
