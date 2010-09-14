@@ -40,8 +40,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     protected $_httpClientAdapterTest;
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * Sets up the fixtures
      */
     protected function setUp()
     {
@@ -54,6 +53,16 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
          */
         require_once 'Zend/Http/Client/Adapter/Test.php';
         $this->_httpClientAdapterTest = new Zend_Http_Client_Adapter_Test();
+    }
+
+    /**
+     * Tears down the fixtrues
+     */
+    protected function  tearDown()
+    {
+        $clearClient = new Zend_Http_Client();
+        $this->_bitly->setHttpClient($clearClient);
+        $this->_bitlyProxy->setHttpClient($clearClient);
     }
 
     /**
@@ -88,10 +97,43 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
                    ->will($this->returnValue($expectedResponse));
 
         $this->_bitlyProxy->setHttpClient($clientStub);
-        $this->_bitlyProxy->_request($methodPath);
+        $result = $this->_bitlyProxy->_request($methodPath);
 
+        $this->assertSame($expectedResponse, $result);
         $this->assertEquals('http://api.bit.ly:80'.$methodPath, $clientStub->getUri(TRUE));
         $this->assertAttributeEquals($expectedParams, 'paramsGet', $clientStub);
+    }
+
+    /**
+     * Tests the creation of results objects
+     *
+     * @covers Zend149_Service_Bitly::_createResult
+     * @dataProvider resultClassesDataProvider
+     */
+    public function testCreateResult($action, $expectedClassName) {
+        $format   = 'json';
+        $response = Zend_Http_Response::fromString($this->_loadResponse($action, $format));
+
+        // Object format
+        $result = $this->_bitlyProxy->_createResult($response, $action);
+        $this->assertTrue(get_class($result) == $expectedClassName);
+
+        // Plain text result
+        $this->_bitlyProxy->setFormat($format);
+        $result = $this->_bitlyProxy->_createResult($response, $action);
+        $this->assertSame($response->getBody(), $result);
+    }
+
+    /**
+     * Data provider or result classes
+     * 
+     * @return array Result Classes
+     */
+    public function resultClassesDataProvider() {
+        return array(
+            'shorten' => array('shorten', 'Zend149_Service_Bitly_Result_Shorten'),
+            'expand'  => array('expand', 'Zend149_Service_Bitly_Result_Expand')
+        );
     }
 
     /**
@@ -101,15 +143,11 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
      */
     public function testShorten()
     {
-        $this->_bitly->getHttpClient()
-                     ->setAdapter($this->_httpClientAdapterTest);
-
-        $this->_bitly->setLogin('micha149')
-                     ->setApiKey('asdasdaad');
-
         $this->_httpClientAdapterTest->setResponse($this->_loadResponse('shorten', 'json'));
 
-        $result = $this->_bitly->shorten('http://example.com/');
+        $this->_bitlyProxy->getHttpClient()->setAdapter($this->_httpClientAdapterTest);
+
+        $result = $this->_bitlyProxy->shorten('http://example.com/');
 
         $this->assertTrue($result instanceof Zend149_Service_Bitly_Result_Shorten);
         $this->assertSame(200, $result->getStatusCode());
@@ -122,13 +160,62 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testExpand().
+     * Tests the expand method
+     * 
+     * @covers Zend149_Service_Bitly::expand
      */
     public function testExpand()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
+        $this->_httpClientAdapterTest->setResponse($this->_loadResponse('expand', 'json'));
+
+        $this->_bitlyProxy->getHttpClient()->setAdapter($this->_httpClientAdapterTest);
+
+        $result = $this->_bitlyProxy->expand('http://bit.ly/atA9Mk');
+
+        $this->assertTrue($result instanceof Zend149_Service_Bitly_Result_Expand);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertSame('OK', $result->getStatusText());
+        $this->assertSame('atA9Mk', $result->getHash());
+        $this->assertSame('http://example.com', $result->getLongUrl());
+        $this->assertSame('atA9Mk', $result->getUserHash());
+        $this->assertSame('4jgguo', $result->getGlobalHash());
+    }
+
+    /**
+     * Tests the different parameter types for expand method
+     *
+     * @covers Zend149_Service_Bitly::expand
+     * @dataProvider expandParameterTypesProvider
+     */
+    public function testExpandParameterType($expectedType, $value)
+    {
+        $expectedParams   =  array (
+            'apiKey'    => 'kaskdllaksdklasdklakd',
+            'format'    => 'json',
+            'login'     => 'micha149',
+        );
+
+        $expectedParams[$expectedType] = $value;
+
+        $client = $this->_bitlyProxy->getHttpClient();
+        $client->setAdapter($this->_httpClientAdapterTest);
+        $this->_httpClientAdapterTest->setResponse($this->_loadResponse('expand', 'json'));
+
+        $result = $this->_bitlyProxy->expand($value);
+
+        $this->assertAttributeEquals($expectedParams, 'paramsGet', $client);
+    }
+
+    /**
+     * Provides the supported parameter types for expand method
+     * 
+     * @return array Parameter types
+     */
+    public function expandParameterTypesProvider()
+    {
+        return array(
+            'url'  => array('shortUrl', 'http://bit.ly/atA9Mk'),
+            'hash' => array('hash', 'atA9Mk')
         );
     }
 
@@ -288,11 +375,6 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
 class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
 {
     
-    public function getFormat()
-    {
-        return 'json';
-    }
-
     public function getApiKey()
     {
         return 'kaskdllaksdklasdklakd';
@@ -306,4 +388,9 @@ class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
     public function  _request($path, array $params = array()) {
         return parent::_request($path, $params);
     }
+
+    public function _createResult(Zend_Http_Response $response, $action) {
+        return parent::_createResult($response, $action);
+    }
+
 }
