@@ -1,8 +1,11 @@
 <?php
 
-require_once 'Zend/Service/Abstract.php';
+namespace Zend149\Service;
 
-class Zend149_Service_Bitly extends Zend_Service_Abstract
+use Zend149\Service\Bitly\Exception;
+
+
+class Bitly extends \Zend_Service_Abstract
 {
     /**
      * Url to the bit.ly API
@@ -54,12 +57,13 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     public function __construct($login = null, $apiKey = null)
     {
         if (!extension_loaded('iconv')) {
-            throw new Zend_Service_Bitly_Exception('Extension "iconv" is not loaded!');
+            throw new Exception('Extension "iconv" is not loaded!');
         }
         
         iconv_set_encoding('output_encoding', 'UTF-8');
         iconv_set_encoding('input_encoding', 'UTF-8');
         iconv_set_encoding('internal_encoding', 'UTF-8');
+        
         $this->setLogin($login);
         $this->setApiKey($apiKey);
     }
@@ -101,7 +105,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      * @param Zend_Http_Response $response Response object
      * @param string $action Action name const like self::ACTION_SHORTEN or self::ACTION_EXPAND
      */
-    protected function _createResult(Zend_Http_Response $response, $action)
+    protected function _createResult(\Zend_Http_Response $response, $action)
     {
         $result    = $response->getBody();
         $className = 'Zend149_Service_Bitly_Result_' . ucfirst($action);
@@ -158,7 +162,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     {
         if ($this->_apiKey === null)
         {
-            throw new Zend149_Service_Bitly_Exception('Api key was not set');
+            throw new Exception('Api key was not set');
         }
         return $this->_apiKey;
     }
@@ -184,7 +188,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     {
         if ($this->_login === null)
         {
-            throw new Zend149_Service_Bitly_Exception('Login name was not set');
+            throw new Exception('Login name was not set');
         }
         return $this->_login;
     }
@@ -223,7 +227,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         
         if (!in_array($format, $allowed))
         {
-            throw new Zend149_Service_Bitly_Exception("Response format '" . $format . "' is not supported");
+            throw new Exception("Response format '" . $format . "' is not supported");
         }
         $this->_format = $format;
         return $this;
