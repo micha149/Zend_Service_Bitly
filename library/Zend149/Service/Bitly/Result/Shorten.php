@@ -1,5 +1,10 @@
 <?php
-class Zend149_Service_Bitly_Result_Shorten extends Zend149_Service_Bitly_Result
+
+namespace Zend149\Service\Bitly\Result;
+
+use Zend149\Service\Bitly\Result;
+
+class Shorten extends Result
 {
     
     protected $_newHash;

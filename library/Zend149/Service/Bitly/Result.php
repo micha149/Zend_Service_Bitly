@@ -1,6 +1,8 @@
-<?php 
+<?php
 
-abstract class Zend149_Service_Bitly_Result
+namespace Zend149\Service\Bitly;
+
+abstract class Result
 {
     protected $_statusCode;
     
@@ -8,7 +10,7 @@ abstract class Zend149_Service_Bitly_Result
     
     public function __construct($result)
     {
-        $resultObject = Zend_Json::decode($result);
+        $resultObject = \Zend_Json::decode($result);
         $this->setStatusCode($resultObject['status_code'])
              ->setStatusText($resultObject['status_txt'])
              ->setData($resultObject['data']);

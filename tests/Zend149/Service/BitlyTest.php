@@ -133,8 +133,8 @@ class BitlyTest extends \PHPUnit_Framework_TestCase
      */
     public function resultClassesDataProvider() {
         return array(
-            'shorten' => array('shorten', 'Zend149_Service_Bitly_Result_Shorten'),
-            'expand'  => array('expand', 'Zend149_Service_Bitly_Result_Expand')
+            'shorten' => array('shorten', 'Zend149\Service\Bitly\Result\Shorten'),
+            'expand'  => array('expand', 'Zend149\Service\Bitly\Result\Expand')
         );
     }
 
@@ -151,7 +151,7 @@ class BitlyTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->_bitlyProxy->shorten('http://example.com/');
 
-        $this->assertTrue($result instanceof \Zend149_Service_Bitly_Result_Shorten);
+        $this->assertTrue($result instanceof Bitly\Result\Shorten);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertSame('OK', $result->getStatusText());
         $this->assertEquals('http://example.com', $result->getLongUrl());
@@ -174,7 +174,7 @@ class BitlyTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->_bitlyProxy->expand('http://bit.ly/atA9Mk');
 
-        $this->assertTrue($result instanceof \Zend149_Service_Bitly_Result_Expand);
+        $this->assertTrue($result instanceof Bitly\Result\Expand);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertSame('OK', $result->getStatusText());
         $this->assertSame('atA9Mk', $result->getHash());

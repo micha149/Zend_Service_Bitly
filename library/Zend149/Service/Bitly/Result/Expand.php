@@ -1,10 +1,15 @@
 <?php
-class Zend149_Service_Bitly_Result_Expand extends Zend149_Service_Bitly_Result
+
+namespace Zend149\Service\Bitly\Result;
+
+use Zend149\Service\Bitly\Result;
+
+class Expand extends Result
 {
 
     public function __construct($result)
     {
-        $resultObject = Zend_Json::decode($result);
+        $resultObject = \Zend_Json::decode($result);
         $this->setStatusCode($resultObject['status_code'])
              ->setStatusText($resultObject['status_txt'])
              ->setData($resultObject['data']['expand'][0]);
