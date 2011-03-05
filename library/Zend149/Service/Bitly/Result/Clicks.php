@@ -12,12 +12,12 @@ class Zend149_Service_Bitly_Result_Clicks extends Zend149_Service_Bitly_Result
     
         foreach ($this->_clicks as &$c) {
             if (isset($c['short_url'])) {
-                $_clicksByUrl[$c['short_url']] =& $c;
-                $_clicksByHash[$c['user_hash']] =& $c;
+                $this->_clicksByUrl[$c['short_url']] =& $c;
+                $this->_clicksByHash[$c['user_hash']] =& $c;
             }
 
             if (isset($c['hash'])) {
-                $_clicksByHash[$c['hash']] =& $c;
+                $this->_clicksByHash[$c['hash']] =& $c;
             }
         }
 
