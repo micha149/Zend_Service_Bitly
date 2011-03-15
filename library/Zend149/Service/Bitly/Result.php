@@ -6,12 +6,14 @@ abstract class Zend149_Service_Bitly_Result
     
     protected $_statusText;
     
-    public function __construct($result)
+    public function __construct($result = null)
     {
-        $resultObject = Zend_Json::decode($result);
-        $this->setStatusCode($resultObject['status_code'])
-             ->setStatusText($resultObject['status_txt'])
-             ->setData($resultObject['data']);
+        if (is_string($result)) {
+            $resultObject = Zend_Json::decode($result);
+            $this->setStatusCode($resultObject['status_code'])
+                 ->setStatusText($resultObject['status_txt'])
+                 ->setData($resultObject['data']);
+        }
     }
     
     public function setStatusCode($code)

@@ -91,7 +91,6 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         ), $params);
        
         $url = self::URI_BASE.$this->_buildUrl($path, $params);
-        Zend_Registry::get('logger')->log($url, Zend_Log::INFO);
         $client->setUri($url);
 
         return $client->request();
@@ -207,8 +206,6 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         $params = $this->separateHashesFromUrls((array) $shortUrls);
 
         $response = $this->_request('/v3/clicks', $params);
-        Zend_Registry::get('logger')->log($response, Zend_Log::INFO);
-        print_r($response);
 
         return $this->_createResult($response, self::ACTION_CLICKS);
     }

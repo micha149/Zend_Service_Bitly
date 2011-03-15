@@ -24,6 +24,15 @@ class Zend149_Service_Bitly_Result_Clicks extends Zend149_Service_Bitly_Result
         return $this;
     }
 
+    public function merge(Zend149_Service_Bitly_Result_Clicks $result)
+    {
+        $this->_clicks += $result->_clicks;
+        $this->_clicksByUrl += $result->_clicksByUrl;
+        $this->_clicksByHash += $result->_clicksByHash;
+
+        return $this;
+    }
+
     public function getClicks()
     {
         return $this->_clicks;
