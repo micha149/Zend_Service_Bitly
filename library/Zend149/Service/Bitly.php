@@ -7,7 +7,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     /**
      * Url to the bit.ly API
      */
-    const URI_BASE = 'http://api.bit.ly/';
+    const URI_BASE = 'http://api.bit.ly';
 
     /**
      * Name for the shorten action
@@ -18,6 +18,11 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      * Name for the expand action
      */
     const ACTION_EXPAND = 'expand';
+
+    /**
+     * Name for the clicks action
+     */
+    const ACTION_CLICKS = 'clicks';
 
     /**
      * The used bit.ly API key
@@ -77,7 +82,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         $client->resetParameters();
         
         // adding base uri
-        $client->setUri(self::URI_BASE);
+        //$client->setUri(self::URI_BASE);
        
         $params = array_merge(array(
             'apiKey' => $this->getApiKey(),
@@ -85,10 +90,50 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
             'format' => $this->getFormat() == 'object' ? 'json' : $this->getFormat(),
         ), $params);
        
-        $client->getUri()->setPath($path);
-        $client->setParameterGet($params);
+        $url = self::URI_BASE.$this->_buildUrl($path, $params);
+        Zend_Registry::get('logger')->log($url, Zend_Log::INFO);
+        $client->setUri($url);
 
         return $client->request();
+    }
+
+    /**
+     * Builds GET request
+     * 
+     * @param string $path url
+     * @param array $params get params
+     * @return string url with encoded params
+     */
+    protected function _buildUrl($path, array $params = array())
+    {
+        $params = $this->_encodeUrl($params);
+        if (strpos($path, '?') === FALSE)
+            $path .= '?'.$params;
+        else
+            $path .= '&'.$params;
+
+        return $path;
+    }
+
+    /**
+     * Encodes GET parameters like `http_build_query` does,
+     * needed because bit.ly request format for arrays is
+     * a=x&a=y&a=z, not a[]=x&a[]=y&a[]=z
+     *
+     * !Does not support nested arrays!
+     *
+     * @param array $params to encode
+     * @return string encoded url
+     */
+    protected function _encodeUrl(array $params)
+    {
+        $url = '';
+        foreach ($params as $key => $value) {
+            foreach ((array) $value as $v)
+                $url .= '&'.$key.'='.urlencode($v);
+        }
+
+        return substr($url, 1);
     }
     
     /**
@@ -137,16 +182,47 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     public function expand($hash)
     {
         $params = array();
-        // If there is any slash in the string, it should be an url
-        if (strpos($hash, '/') !== FALSE) {
-            $params['shortUrl'] = $hash;
-        } else {
+
+        if ($this->isHash($hash)) {
             $params['hash'] = $hash;
+        } else {
+            $params['shortUrl'] = $hash;
         }
 
         $response = $this->_request('/v3/expand', $params);
 
         return $this->_createResult($response, self::ACTION_EXPAND);
+    }
+
+    /**
+     * Given a list of bit.ly shor URLs or hashes, this method
+     * returns overall click statistics on that links.
+     *
+     * @param array shortUrls list of short urls
+     * @return Zend149_Service_Bitly_Result_Clicks
+     */
+    public function clicks(array $shortUrls)
+    {
+        //TODO: make appropriate exception classes
+        if (count($shortUrls) == 0) {
+            throw new Zend149_Service_Bitly_Exception('At least one short url or hash should be passed');
+        } else if (count($shortUrls) > 15) {
+            throw new Zend149_Service_Bitly_Exception('The maximum number of short urls or hashes is 15');
+        }
+
+        $params = array();
+
+        if ($this->isHash($shortUrls[0])) {
+            $params['hash'] = $shortUrls;
+        } else {
+            $params['shortUrl'] = $shortUrls;
+        }
+
+        $response = $this->_request('/v3/clicks', $params);
+        Zend_Registry::get('logger')->log($response, Zend_Log::INFO);
+        print_r($response);
+
+        return $this->_createResult($response, self::ACTION_CLICKS);
     }
     
     /**
@@ -227,5 +303,16 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         }
         $this->_format = $format;
         return $this;
+    }
+
+    /**
+     * Checks if provided string is bit.ly hash or url
+     *
+     * @param string $str
+     * @return bool
+     */
+    protected function isHash($str) {
+        // If there is any slash in the string, it should be an url
+        return strpos($str, '/') === FALSE;
     }
 }
