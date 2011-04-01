@@ -383,6 +383,18 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('object', $result);
     }
 
+    /**
+     * Tests the check method for urls or hases
+     *
+     * @covers Zend149_Service_Bitly::_isHash
+     */
+    public function testIsHash()
+    {
+        $bitly = $this->_bitlyProxy;
+
+        $this->assertTrue($bitly->_isHash('atA9Mk'));
+        $this->assertFalse($bitly->_isHash('http://bit.ly/hsdbA2D'));
+    }
 }
 
 class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
@@ -404,6 +416,11 @@ class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
 
     public function _createResult(Zend_Http_Response $response, $action) {
         return parent::_createResult($response, $action);
+    }
+
+    public function _isHash($str)
+    {
+        return parent::_isHash($str);
     }
 
 }
