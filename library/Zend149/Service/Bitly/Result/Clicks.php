@@ -12,23 +12,14 @@ class Zend149_Service_Bitly_Result_Clicks extends Zend149_Service_Bitly_Result
     
         foreach ($this->_clicks as &$c) {
             if (isset($c['short_url'])) {
-                $this->_clicksByUrl[$c['short_url']] =& $c;
-                $this->_clicksByHash[$c['user_hash']] =& $c;
+                $_clicksByUrl[$c['short_url']] =& $c;
+                $_clicksByHash[$c['user_hash']] =& $c;
             }
 
             if (isset($c['hash'])) {
-                $this->_clicksByHash[$c['hash']] =& $c;
+                $_clicksByHash[$c['hash']] =& $c;
             }
         }
-
-        return $this;
-    }
-
-    public function merge(Zend149_Service_Bitly_Result_Clicks $result)
-    {
-        $this->_clicks += $result->_clicks;
-        $this->_clicksByUrl += $result->_clicksByUrl;
-        $this->_clicksByHash += $result->_clicksByHash;
 
         return $this;
     }
