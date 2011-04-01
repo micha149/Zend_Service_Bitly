@@ -185,7 +185,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
     {
         $params = array();
 
-        if ($this->isHash($hash)) {
+        if ($this->_isHash($hash)) {
             $params['hash'] = $hash;
         } else {
             $params['shortUrl'] = $hash;
@@ -214,7 +214,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
 
         $params = array();
 
-        if ($this->isHash($shortUrls[0])) {
+        if ($this->_isHash($shortUrls[0])) {
             $params['hash'] = $shortUrls;
         } else {
             $params['shortUrl'] = $shortUrls;
@@ -311,7 +311,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      * @param string $str
      * @return bool
      */
-    protected function isHash($str) {
+    protected function _isHash($str) {
         // If there is any slash in the string, it should be an url
         return strpos($str, '/') === FALSE;
     }
