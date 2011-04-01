@@ -1,4 +1,5 @@
-h1. Zend service component for bit.ly shortening service
+Zend service component for bit.ly shortening service
+====================================================
 
 Zend149_Service_Bitly is an additional component for the zend framework. It allows you to use the bit.ly shortening service thourgh a php class.
 
