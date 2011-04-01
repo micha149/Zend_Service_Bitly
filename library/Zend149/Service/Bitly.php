@@ -94,7 +94,6 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         ), $params);
        
         $url = self::URI_BASE.$this->_buildUrl($path, $params);
-        Zend_Registry::get('logger')->log($url, Zend_Log::INFO);
         $client->setUri($url);
 
         return $client->request();
@@ -184,13 +183,7 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      */
     public function expand($hash)
     {
-        $params = array();
-
-        if ($this->_isHash($hash)) {
-            $params['hash'] = $hash;
-        } else {
-            $params['shortUrl'] = $hash;
-        }
+        $params = $this->separateHashesFromUrls((array) $hash);
 
         $response = $this->_request('/v3/expand', $params);
 
@@ -213,17 +206,43 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
             throw new Zend149_Service_Bitly_Exception('The maximum number of short urls or hashes is 15');
         }
 
-        $params = array();
-
-        if ($this->_isHash($shortUrls[0])) {
-            $params['hash'] = $shortUrls;
-        } else {
-            $params['shortUrl'] = $shortUrls;
-        }
+        $params = $this->separateHashesFromUrls((array) $shortUrls);
 
         $response = $this->_request('/v3/clicks', $params);
 
         return $this->_createResult($response, self::ACTION_CLICKS);
+    }
+
+    /**
+     * Separate array of strings (hashes & urls) to arrays
+     * of ['hash' => [hashes], 'shortUrl' => [urls]]
+     * 
+     * @param array $mixed
+     * @return array
+     */
+    protected function separateHashesFromUrls(array $mixed)
+    {
+        $result = array();
+
+        foreach ($mixed as $m) {
+            if ($this->_isHash($m))
+                $result['hash'][] = $m;
+            else
+                $result['shortUrl'][] = $m;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Checks if provided string is bit.ly hash or url
+     *
+     * @param string $str
+     * @return bool
+     */
+    protected function _isHash($str) {
+        // If there is any slash in the string, it should be an url
+        return strpos($str, '/') === FALSE;
     }
     
     /**
@@ -304,16 +323,5 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
         }
         $this->_format = $format;
         return $this;
-    }
-
-    /**
-     * Checks if provided string is bit.ly hash or url
-     *
-     * @param string $str
-     * @return bool
-     */
-    protected function _isHash($str) {
-        // If there is any slash in the string, it should be an url
-        return strpos($str, '/') === FALSE;
     }
 }
