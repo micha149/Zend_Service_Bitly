@@ -1,7 +1,4 @@
 <?php
-
-require_once 'PHPUnit/Framework.php';
-
 require_once dirname(__FILE__) . '/../../../library/Zend149/Service/Bitly.php';
 
 /**
@@ -397,6 +394,12 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 }
 
+/**
+ * This proxy object turns all protected methods into public.
+ *
+ * Note: use this object only for explicit tests on protected methods. For public methods use the
+ *       basic class to ensure access levels.
+ */
 class Zend149_Service_BitlyProxy extends Zend149_Service_Bitly
 {
     
