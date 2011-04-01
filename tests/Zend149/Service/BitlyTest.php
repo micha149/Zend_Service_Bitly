@@ -77,6 +77,19 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests the object initialization
+     */
+    public function testConstructor()
+    {
+        $login  = 'micha149';
+        $apiKey = 'kaskdllaksdklasdklakd';
+        $bitly  = new Zend149_Service_Bitly($login, $apiKey);
+
+        $this->assertAttributeEquals($login, '_login', $bitly);
+        $this->assertAttributeEquals($apiKey, '_apiKey', $bitly);
+    }
+
+    /**
      * Tests the request method
      *
      * @covers Zend149_Service_Bitly::_request
@@ -86,11 +99,11 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
         $clientStub       = $this->getMock('Zend_Http_Client', array('request'));
         $expectedResponse = 'Dummy';
         $methodPath       = '/path/to/method';
-        $expectedParams   =  array (
+        $expectedUri      = 'http://api.bit.ly:80' . $methodPath . '?' . http_build_query(array(
             'apiKey' => 'kaskdllaksdklasdklakd',
-            'format' => 'json',
             'login'  => 'micha149',
-        );
+            'format' => 'json',
+        ));
 
         $clientStub->expects($this->once())
                    ->method('request')
@@ -100,8 +113,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
         $result = $this->_bitlyProxy->_request($methodPath);
 
         $this->assertSame($expectedResponse, $result);
-        $this->assertEquals('http://api.bit.ly:80'.$methodPath, $clientStub->getUri(TRUE));
-        $this->assertAttributeEquals($expectedParams, 'paramsGet', $clientStub);
+        $this->assertEquals($expectedUri, $clientStub->getUri(TRUE));
     }
 
     /**
@@ -191,11 +203,12 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
     {
         $expectedParams   =  array (
             'apiKey'    => 'kaskdllaksdklasdklakd',
-            'format'    => 'json',
             'login'     => 'micha149',
+            'format'    => 'json',
         );
-
+        
         $expectedParams[$expectedType] = $value;
+        $expectedUri = 'http://api.bit.ly:80/v3/expand?' . http_build_query($expectedParams);
 
         $client = $this->_bitlyProxy->getHttpClient();
         $client->setAdapter($this->_httpClientAdapterTest);
@@ -203,7 +216,7 @@ class Zend149_Service_BitlyTest extends PHPUnit_Framework_TestCase
 
         $result = $this->_bitlyProxy->expand($value);
 
-        $this->assertAttributeEquals($expectedParams, 'paramsGet', $client);
+        $this->assertEquals($expectedUri, $client->getUri(true));
     }
 
     /**

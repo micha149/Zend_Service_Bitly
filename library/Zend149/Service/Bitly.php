@@ -58,13 +58,16 @@ class Zend149_Service_Bitly extends Zend_Service_Abstract
      */
     public function __construct($login = null, $apiKey = null)
     {
+        // @codeCoverageIgnoreStart
         if (!extension_loaded('iconv')) {
             throw new Zend_Service_Bitly_Exception('Extension "iconv" is not loaded!');
         }
-        
+
         iconv_set_encoding('output_encoding', 'UTF-8');
         iconv_set_encoding('input_encoding', 'UTF-8');
         iconv_set_encoding('internal_encoding', 'UTF-8');
+        // @codeCoverageIgnoreEnd
+
         $this->setLogin($login);
         $this->setApiKey($apiKey);
     }
